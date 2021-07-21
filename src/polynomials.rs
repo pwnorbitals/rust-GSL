@@ -258,3 +258,53 @@ pub mod cubic_equations {
         })
     }
 }
+
+pub mod general_polynomial_equations {
+    use types::ComplexF64;
+
+    /// This function computes the roots of the general polynomial
+    ///
+    /// P(x) = a_0 + a_1 x + a_2 x^2 + \cdots + a_{n-1} x^{n-1}
+    ///
+    /// using balanced-QR reduction of the companion matrix. The parameter n specifies the length
+    /// of the coefficient array. The coefficient of the highest order term must be non-zero. 
+    /// The function requires a workspace w of the appropriate size. The n-1 roots are returned
+    /// in the packed complex array z of length 2(n-1), alternating real and imaginary parts.
+    ///
+    /// The function returns GSL_SUCCESS if all the roots are found. If the QR reduction does 
+    /// not converge, the error handler is invoked with an error code of GSL_EFAILED. Note that 
+    /// due to finite precision, roots of higher multiplicity are returned as a cluster of simple
+    /// roots with reduced accuracy. The solution of polynomials with higher-order roots requires
+    /// specialized algorithms that take the multiplicity structure into account (see e.g. Z.
+    /// Zeng, Algorithm 835, ACM Transactions on Mathematical Software, Volume 30, Issue 2
+    /// (2004), pp 218–236).
+    #[doc(alias = "gsl_poly_complex_solve")]
+    pub fn poly_complex_solve(
+        a : &[f64]
+    ) -> (::Value, Vec<ComplexF64>) {   
+        let z_len = 2*(a.len()-1);
+        let mut z = vec![0.0; z_len];
+
+        let ret = ::Value::from(unsafe {
+
+            let w = sys::gsl_poly_complex_workspace_alloc(a.len());
+            let res = sys::gsl_poly_complex_solve(a.as_ptr(), a.len(), w, z.as_mut_slice().as_mut_ptr());
+            sys::gsl_poly_complex_workspace_free(w);
+
+            res
+        });
+
+        let mut z_out = vec![ComplexF64{dat : [0.0, 0.0]}; a.len()-1];
+        let mut elem_iter = z.into_iter();
+        for i in 0..z_len {
+            // The unwraps should never fail
+            let re = elem_iter.next().unwrap();
+            let im = elem_iter.next().unwrap(); 
+            z_out[i] = ComplexF64{dat: [re, im]};
+        }
+
+        (ret, z_out)
+
+    }
+
+}

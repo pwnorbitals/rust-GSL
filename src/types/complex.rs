@@ -74,29 +74,6 @@ impl ComplexF64 {
         unsafe { ::sys::gsl_complex_logabs(self.unwrap()) }
     }
 
-    /// This function returns the sum of the complex numbers a and b, z=a+b.
-    #[doc(alias = "gsl_complex_add")]
-    pub fn add(&self, other: &ComplexF64) -> ComplexF64 {
-        unsafe { ::sys::gsl_complex_add(self.unwrap(), other.unwrap()).wrap() }
-    }
-
-    /// This function returns the difference of the complex numbers a and b, z=a-b.
-    #[doc(alias = "gsl_complex_sub")]
-    pub fn sub(&self, other: &ComplexF64) -> ComplexF64 {
-        unsafe { ::sys::gsl_complex_sub(self.unwrap(), other.unwrap()).wrap() }
-    }
-
-    /// This function returns the product of the complex numbers a and b, z=ab.
-    #[doc(alias = "gsl_complex_mul")]
-    pub fn mul(&self, other: &ComplexF64) -> ComplexF64 {
-        unsafe { ::sys::gsl_complex_mul(self.unwrap(), other.unwrap()).wrap() }
-    }
-
-    /// This function returns the quotient of the complex numbers a and b, z=a/b.
-    #[doc(alias = "gsl_complex_div")]
-    pub fn div(&self, other: &ComplexF64) -> ComplexF64 {
-        unsafe { ::sys::gsl_complex_div(self.unwrap(), other.unwrap()).wrap() }
-    }
 
     /// This function returns the sum of the complex number a and the real number x, z=a+x.
     #[doc(alias = "gsl_complex_add_real")]
@@ -160,12 +137,6 @@ impl ComplexF64 {
     #[doc(alias = "gsl_complex_inverse")]
     pub fn inverse(&self) -> ComplexF64 {
         unsafe { ::sys::gsl_complex_inverse(self.unwrap()).wrap() }
-    }
-
-    /// This function returns the negative of the complex number z, -z = (-x) + i(-y).
-    #[doc(alias = "gsl_complex_negative")]
-    pub fn negative(&self) -> ComplexF64 {
-        unsafe { ::sys::gsl_complex_negative(self.unwrap()).wrap() }
     }
 
     /// This function returns the square root of the complex number z, \sqrt z.
@@ -444,6 +415,71 @@ impl ComplexF64 {
 
     pub fn imaginary(&self) -> f64 {
         self.dat[1]
+    }
+}
+
+impl std::ops::Add<ComplexF64> for ComplexF64 {
+    type Output = ComplexF64;
+
+    /// This function returns the sum of the complex numbers a and b, z=a+b.
+    #[doc(alias = "gsl_complex_add")]
+    fn add(self, other: ComplexF64) -> ComplexF64 {
+        unsafe { ::sys::gsl_complex_add(self.unwrap(), other.unwrap()).wrap() }
+    }
+}
+
+impl std::ops::Sub<ComplexF64> for ComplexF64 {
+    type Output = ComplexF64;
+
+    /// This function returns the difference of the complex numbers a and b, z=a-b.
+    #[doc(alias = "gsl_complex_sub")]
+    fn sub(self, other: ComplexF64) -> ComplexF64 {
+        unsafe { ::sys::gsl_complex_sub(self.unwrap(), other.unwrap()).wrap() }
+    }
+}
+impl std::ops::Mul<ComplexF64> for ComplexF64 {
+    type Output = ComplexF64;
+
+    /// This function returns the product of the complex numbers a and b, z=ab.
+    #[doc(alias = "gsl_complex_mul")]
+    fn mul(self, other: ComplexF64) -> ComplexF64 {
+        unsafe { ::sys::gsl_complex_mul(self.unwrap(), other.unwrap()).wrap() }
+    }
+}
+
+impl std::ops::Div<ComplexF64> for ComplexF64 {
+    type Output = ComplexF64;
+
+    /// This function returns the quotient of the complex numbers a and b, z=a/b.
+    #[doc(alias = "gsl_complex_div")]
+    fn div(self, other: ComplexF64) -> ComplexF64 {
+        unsafe { ::sys::gsl_complex_div(self.unwrap(), other.unwrap()).wrap() }
+    }
+}
+
+impl std::ops::Neg for ComplexF64 {
+    type Output = ComplexF64;
+
+    /// This function returns the negative of the complex number z, -z = (-x) + i(-y).
+    #[doc(alias = "gsl_complex_negative")]
+    fn neg(self) -> ComplexF64 {
+        unsafe { ::sys::gsl_complex_negative(self.unwrap()).wrap() }
+    }
+}
+
+impl num::Zero for ComplexF64 {
+    fn zero() -> ComplexF64 {
+        ComplexF64 { dat : [0.0, 0.0] }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.dat[0] == 0.0 && self.dat[1] == 0.0
+    }
+}
+
+impl std::convert::From<f64> for ComplexF64 {
+    fn from(data : f64) -> ComplexF64 {
+        ComplexF64 { dat : [data, 0.0] }
     }
 }
 
@@ -1251,22 +1287,22 @@ fn complex_f64() {
     let arg = v.logabs();
     assert_eq!(format!("{:.4}", arg), "1.6094".to_owned());
 
-    let v3 = v.add(&v2);
+    let v3 = v + v2;
     assert_eq!(
         format!("{:.4} {:.4}", v3.dat[0], v3.dat[1]),
         "4.7695 2.2849".to_owned()
     );
-    let v3 = v.sub(&v2);
+    let v3 = v - v2;
     assert_eq!(
         format!("{:.4} {:.4}", v3.dat[0], v3.dat[1]),
         "2.7695 4.2849".to_owned()
     );
-    let v3 = v.mul(&v2);
+    let v3 = v * v2;
     assert_eq!(
         format!("{:.4} {:.4}", v3.dat[0], v3.dat[1]),
         "7.0544 -0.4846".to_owned()
     );
-    let v3 = v.div(&v2);
+    let v3 = v / v2;
     assert_eq!(
         format!("{:.4} {:.4}", v3.dat[0], v3.dat[1]),
         "0.2423 3.5272".to_owned()
@@ -1323,7 +1359,7 @@ fn complex_f64() {
         format!("{:.4} {:.4}", v3.dat[0], v3.dat[1]),
         "0.1508 -0.1314".to_owned()
     );
-    let v3 = v.negative();
+    let v3 = -v;
     assert_eq!(
         format!("{:.4} {:.4}", v3.dat[0], v3.dat[1]),
         "-3.7695 -3.2849".to_owned()
