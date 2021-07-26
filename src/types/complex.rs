@@ -428,6 +428,12 @@ impl std::ops::Add<ComplexF64> for ComplexF64 {
     }
 }
 
+impl std::ops::AddAssign<ComplexF64> for ComplexF64 {
+    fn add_assign(&mut self, rhs: ComplexF64) {
+        *self = *self + rhs;
+    }
+}
+
 impl std::ops::Sub<ComplexF64> for ComplexF64 {
     type Output = ComplexF64;
 
@@ -437,6 +443,13 @@ impl std::ops::Sub<ComplexF64> for ComplexF64 {
         unsafe { ::sys::gsl_complex_sub(self.unwrap(), other.unwrap()).wrap() }
     }
 }
+
+impl std::ops::SubAssign<ComplexF64> for ComplexF64 {
+    fn sub_assign(&mut self, rhs: ComplexF64) {
+        *self = *self - rhs;
+    }
+}
+
 impl std::ops::Mul<ComplexF64> for ComplexF64 {
     type Output = ComplexF64;
 
@@ -447,6 +460,12 @@ impl std::ops::Mul<ComplexF64> for ComplexF64 {
     }
 }
 
+impl std::ops::MulAssign<ComplexF64> for ComplexF64 {
+    fn mul_assign(&mut self, rhs: ComplexF64) {
+        *self = *self * rhs;
+    }
+}
+
 impl std::ops::Div<ComplexF64> for ComplexF64 {
     type Output = ComplexF64;
 
@@ -454,6 +473,12 @@ impl std::ops::Div<ComplexF64> for ComplexF64 {
     #[doc(alias = "gsl_complex_div")]
     fn div(self, other: ComplexF64) -> ComplexF64 {
         unsafe { ::sys::gsl_complex_div(self.unwrap(), other.unwrap()).wrap() }
+    }
+}
+
+impl std::ops::DivAssign<ComplexF64> for ComplexF64 {
+    fn div_assign(&mut self, rhs: ComplexF64) {
+        *self = *self / rhs;
     }
 }
 
