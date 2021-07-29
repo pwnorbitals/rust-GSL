@@ -282,8 +282,7 @@ pub mod general_polynomial_equations {
     pub fn poly_complex_solve(
         a : &[f64]
     ) -> (::Value, Vec<ComplexF64>) {   
-        let z_len = 2*(a.len()-1);
-        let mut z = vec![0.0; z_len];
+        let mut z = vec![0.0; 2*(a.len()-1)];
 
         let ret = ::Value::from(unsafe {
 
@@ -296,7 +295,7 @@ pub mod general_polynomial_equations {
 
         let mut z_out = vec![ComplexF64{dat : [0.0, 0.0]}; a.len()-1];
         let mut elem_iter = z.into_iter();
-        for i in 0..z_len {
+        for i in 0..a.len()-1 {
             // The unwraps should never fail
             let re = elem_iter.next().unwrap();
             let im = elem_iter.next().unwrap(); 
